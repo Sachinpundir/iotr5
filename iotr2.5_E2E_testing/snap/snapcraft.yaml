@@ -1,0 +1,43 @@
+name: itron-automated-test 
+version: 0.1
+summary: iotr2.5 test automation
+description: iotr2.5 E2E test automation
+grade: devel
+confinement: devmode
+
+parts:
+    plainbox-provider-automation:
+        plugin: plainbox-provider
+        source: ./plainbox-provider-automation
+        after: [plainbox]
+    launchers:
+        plugin: dump
+        source: launchers/
+        organize:
+            '*': bin/
+    plainbox:
+       plugin: nil
+       stage-packages:
+            - plainbox
+            - checkbox-ng
+    config-variable:
+       plugin: dump
+       source: config
+    my-service:
+       plugin: dump
+       source: daily_check 
+
+
+apps:
+    test-runner:
+        command: bin/test-runner
+    itron-wan:
+        command: bin/wan-mode
+    itron-edge:
+        command: bin/edge-mode
+    itron-client:
+        command: bin/client-mode
+    daily-test-execution:
+        command: daily_execution_test
+        daemon: simple
+        restart-condition: always

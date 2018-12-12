@@ -1,0 +1,113 @@
+unit: test plan
+id: iotr2-test-automation
+_name: E2E-Testing 
+_description:
+    This test plan includes all test related to Northstart Release
+estimated_duration: 1h
+include:
+   iotr_configuration
+   ssh_login
+   checking_ntp_configured
+   checking_mode_activation
+   test-hello-world
+   iotr_registered_to_access_point
+   iotr_nic_setting_edge
+   time_sync_accuracy
+   verify_edge_got_ap_blobs
+   edge_device_can_reach_internet
+   iotr_updates_the_timesync_information
+   iotr_able_to_scan_other_iotrs_and_aps
+   iotr_mesh_stability_connection_test
+   led_status_edge
+   ntp_server_edge
+   wan_mode-edge_connected_with_wan
+   wan_mode-edge_to_bos_via_wan
+   tunnel_configuration
+   led_status_wan
+   switching_to_wan_mode
+   ntp_server_wan
+   led_status_client
+   iotr_registered_to_access_point_in_client_mode
+   ipv6_connectivity_to_back_office_from/to_iotr
+   ipv4_connectivity_to_internet_in_client_mode
+   recursion_lookup_and_ping_from_iotr
+   curl_operation_client_mode
+   snap_login
+   itron-store
+   snap_refresh
+   test-hello-world_ubuntu 
+   config_test 
+   usb
+
+unit: test plan
+id: wan-mode
+_name: WAN_Mode
+_description:
+   This test plan includes all the automated test case related to WAN_Mode
+estimated_duration: 1h
+include:
+   checking_mode_activation
+   test-hello-world
+#   ap_functionality_1              #not applicable for  northstar
+   tunnel_configuration
+   led_status_wan
+   switching_to_wan_mode
+   ntp_server_wan
+   itron-store
+   snap_refresh
+   test-hello-world_ubuntu
+
+unit: test plan
+id: edge-mode
+_name: EDGE_Mode
+_description:
+   This test plan includes all the automated test case related to EDEG_Mode
+estimated_duration: 1h
+include:
+   checking_mode_activation
+   test-hello-world
+   iotr_able_to_scan_other_iotrs_and_aps
+   iotr_registered_to_access_point
+   time_sync_accuracy
+   verify_edge_got_ap_blobs
+   edge_device_can_reach_internet
+   led_status_edge
+   ntp_server_edge
+   iotr_updates_the_timesync_information
+   iotr_mesh_stability_connection_test
+   curl_to_internet_from_connected_pc
+   aftr_configuration_edge
+   wan_mode-edge_connected_with_wan                 #Checking Edge mode connectivity via Wan mode
+   wan_mode-edge_to_bos_via_wan                     #     "     "   "      "          "  "   "
+   itron-store
+   snap_refresh
+   test-hello-world_ubuntu
+
+unit: test plan
+id: client-mode
+_name: CLIENT_Mode
+_description:
+   This test plan includes all the automated test case related to CLIENT_Mode
+estimated_duration: 1h
+include:
+   checking_mode_activation
+   test-hello-world
+   iotr_client_mode_activation
+   led_status_client
+   iotr_registered_to_access_point_in_client_mode
+   ipv4_connectivity_to_internet_in_client_mode
+   recursion_lookup_and_ping_from_iotr
+   curl_operation_client_mode
+   ipv6_connectivity_to_back_office_from/to_iotr
+   itron-store
+   snap_refresh
+   test-hello-world_ubuntu
+
+unit: test plan
+id: iotr2-test-automation
+_name: s-and-s 
+_description:
+    This test plan includes all test related to Northstart Release
+estimated_duration: 1h
+include:
+   usb

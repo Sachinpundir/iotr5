@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+#set the default values
+snapctl set user-id=XXXX
+snapctl set password=XXXX
+snapctl set publickey=XXXX
+snapctl set time_in_sec_usb=100
+snapctl set b=5
+snapctl set daily-excution-sleep-time=30

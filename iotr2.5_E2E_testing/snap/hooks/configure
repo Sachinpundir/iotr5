@@ -1,0 +1,8 @@
+#!/bin/sh -e
+
+user_id="$(snapctl get user-id)"
+passwd="$(snapctl get password)"
+pubkey="$(snapctl get public-key)"
+time_in_sec_usb="$(snapctl get time_in_sec_usb)"
+b="$(snapctl get b)"
+sleep_time="$(snapctl get daily-excution-sleep-time)"
