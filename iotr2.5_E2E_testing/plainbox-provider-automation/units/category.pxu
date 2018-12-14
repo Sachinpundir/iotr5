@@ -19,5 +19,5 @@ id: wan_mode_test
 _name: WAN Mode
 
 unit: category
-id: usb
+id: usb_stress
 _name: usb stress 

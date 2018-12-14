@@ -103,11 +103,11 @@ include:
    snap_refresh
    test-hello-world_ubuntu
 
-unit: test plan
-id: iotr2-test-automation
-_name: s-and-s 
-_description:
-    This test plan includes all test related to Northstart Release
-estimated_duration: 1h
-include:
-   usb
+#unit: test plan
+#id: iotr2-test-automation
+#_name: s-and-s 
+#_description:
+#    This test plan includes all test related to Northstart Release
+#estimated_duration: 1h
+#include:
+#   usb
