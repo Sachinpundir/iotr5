@@ -1,0 +1,23 @@
+unit: category
+id: provisioning
+_name: Device Provisioning
+
+unit: category
+id: edge_mode_test
+_name: Edge Mode
+
+unit: category 
+id: ubuntu_store_functionality
+_name: Ubuntu Core New Functionality
+
+unit: category
+id: client_mode_test
+_name: Client Mode
+
+unit: category
+id: wan_mode_test
+_name: WAN Mode
+
+unit: category
+id: usb_stress
+_name: usb stress 
