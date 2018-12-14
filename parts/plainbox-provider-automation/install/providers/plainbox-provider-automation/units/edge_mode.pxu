@@ -1,0 +1,324 @@
+id: iotr_able_to_scan_other_iotrs_and_aps 
+_summary: Verify weather IoTR is able to scan other IoTRs & APs
+_description:
+      this automated-test will check  weather IoTR is able to scan other IoTRs & APs
+plugin: shell
+category_id: edge_mode_test
+estimated_duration: 5s
+command:
+  echo "Command: itron-edge.netmgr -i nodeq 0" && itron-edge.netmgr -i nodeq 0
+  itron-edge.netmgr -i nodeq 0 | head -1 | awk '{if($3 == 0) exit 1}'
+
+id: iotr_registered_to_access_point
+_summary: verifying IoTR registerd to Access Point
+_description:
+      this auromated-test will verify IoTR registerd to Access Point
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+  echo "Command: itron-edge.netmgr -i nodeq 0" &&  itron-edge.netmgr -i nodeq 0
+  itron-edge.netmgr -i nodeq 0 | head -1 | awk '{if($3 == 0) exit 1}'
+
+id: iotr_nic_setting_edge
+_summary: IOTR SSN NIC Settings
+plugin: manual
+category_id: edge_mode_test 
+estimated_duration: 20.0
+_description:
+ PURPOSE:
+     This test will verify IOTR SSN NIC settings via web page and net_mgr (country code, network id, start word, SSN firmware version, MAC address)
+ STEPS:
+     1. Connect your PC to IoTR via Ethernet cable before boot.
+     2. Boot into system
+     3. Browse following url with browser from other machine in same network
+        http://[ip address of the IoTR Device ]
+     5. Wait for almost 1min to load the page
+     6. Now you are able see local SSN Edge Router Config page.
+     7. You can See Device Manager which is on the left side of the page.
+     8. Select IoTR and go to Provisioning.
+     9. Here you can see NIC Start Word, NIC FW version, NIC Device Type and you can Set Network Id and Country Code as well.
+ VERIFICATION:
+     Did all the steps work?
+
+id: time_sync_accuracy
+_summary: Verify time sync stability after several hour of testing
+_description:
+      this auromated-test will verify stability of time sync after several of testing
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+  echo "Command: itron-edge.netmgr -i conf timesync ts_accuracy_req" && itron-edge.netmgr -i conf timesync ts_accuracy_req
+  itron-edge.netmgr -i conf timesync ts_accuracy_req | head -1 | awk '{if($8 != 1200) exit 1}' 
+  echo "itron-edge.netmgr -i iotr network_prefix show" && itron-edge.netmgr -i iotr network_prefix show
+  itron-edge.netmgr -i iotr network_prefix show | awk '{if($4 == "0") exit 1}'
+
+id: verify_edge_got_ap_blobs
+_summary: Verify via netmgr EDGE got AP blobs
+_description:
+      this automated-test will verify via netmgr EDGE got AP blobs 
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+   echo "COMMAND: itron-edge.netmgr -i dns server_list" && itron-edge.netmgr -i dns server_list
+   itron-edge.netmgr -i dns server_list | awk '{if($3 == "0") exit 1}'
+   echo "COMMAND: itron-edge.netmgr -i iotr aftr_address show" && itron-edge.netmgr -i iotr aftr_address show
+   itron-edge.netmgr -i iotr aftr_address show | awk '{if($4 == "0") exit 1}'
+   echo "COMMAND: itron-edge.netmgr -i nm_trap host_get" && itron-edge.netmgr -i nm_trap host_get
+   itron-edge.netmgr -i nm_trap host_get | awk '{if($4 == "0") exit 1}'
+
+id: edge_device_can_reach_internet
+_summary: Verify EDGE device can reach internet (via V4)
+_description:
+      this test will verify EDGE device can reach internet (via V4)
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+  echo "Checking connectivity of EDGE device to internet by pinging google.com" &&  ping -c 2 google.com
+  ping -c 10 goggle.com | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'
+
+##  not Applicable for Northstar #######
+id: ipv4_connectivity_to_internet 
+_summary: IPv4 connectivity to Internet from connected PC
+_description:
+      this auromated-test will verify IPv4 connectivity to Internet from connected PC
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+  echo "Checking connectivity to internet by pinging Google DNS Server" &&  ping -c 2 8.8.8.8
+  ping -c 2 8.8.8.8 | tail -2 | head -1 | awk '{if($4 != 2) exit 1}'
+
+id: led_status_edge
+_summary: Verify the led status is set to RED
+_description:
+      In EDGE Mode LED Status should be RED 
+      /sys/class/gpio/gpio193/value = 1
+      /sys/class/gpio/gpio192/value = 0
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+   st=$'1 0: EDGE mode (RED)\n1 1: CLIENT mode (ORANGE)\n0 1: WAN mode (GREEN)'
+   echo "$st"
+   echo "Expected: 1 0 EDGE MODE (RED)"
+   val_1=$(cat /sys/class/gpio/gpio193/value)
+   val_2=$(cat /sys/class/gpio/gpio192/value)
+   echo "Actual: $val_1 $val_2"
+   if [ $val_1 = "1" -a $val_2 = "0" ]
+   then
+         exit 0
+   else
+         exit 1
+   fi
+  
+id: ntp_server_edge
+_summary: Verify edge can reach the ubuntu ntp server and get the proper timesync
+_description:
+      Verify edge can reach the ubuntu ntp server and get the proper timesync
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+   echo "command: journalctl | grep systemd-timesyncd" && journalctl | grep systemd-timesyncd
+   count=$(journalctl | grep systemd-timesyncd | grep -c Synchronized)
+   if ["$count" != "0" ]
+   then
+        exit 1
+   else
+        exit 0
+   fi
+
+id: iotr_updates_the_timesync_information
+_summary: verify the timesync is not lost during several hour of testing
+_description:
+      testing timesync information will not lost during several hour of testing 
+      here: checking timesync information every 5 mins
+plugin: shell
+estimated_duration: 3600s
+category_id: edge_mode_test
+command:
+  Time_in_sec () {
+        date=$(itron-edge.netmgr -i time local | head -2 | tail -1 | awk '{print $2}')
+        hr="$(cut -d':' -f1 <<<"$date")"
+        min="$(cut -d':' -f2 <<<"$date")"
+        sec="$(cut -d':' -f3 <<<"$date")"
+        sec=`expr $hr \* 3600 + "$min" \* 60 + $sec`
+        ret=$sec
+  }
+  itron-edge.netmgr -i time set_time off 
+  s_time=300
+  delta=10
+  echo "Test for 1 hour"
+  for i in {1..12};
+  do
+      Time_in_sec
+      retval1=$ret
+      echo "current time : $date"
+      echo "waiting for $s_time s"
+      sleep "$s_time"s
+      Time_in_sec
+  retval2=$ret
+      diff=$(expr "$retval2" - "$retval1")
+      if [[ $diff -gt `expr $s_time - $delta` && $diff -lt `expr $s_time + $delta` ]]; then
+          exit 0
+      else
+         exit 1 
+      fi
+  done
+
+id: iotr_mesh_stability_connection_test
+_summary: IoTR mesh stability connection test
+_description:
+      Make sure the mesh connection to WAN IoTR is stable - long run test 1 or 2 days Check node age
+plugin: shell
+estimated_duration: 172800s
+category_id: edge_mode_test
+command:
+    echo "itron-edge.netmgr -i node_age" && itron-edge.netmgr -i node_age
+    f_sec=$(itron-edge.netmgr -i node_age | head -1 | awk '{print $4}')
+    sleep 24h
+    l_sec=$(itron-edge.netmgr -i node_age | head -1 | awk '{print $4}')
+    diff=$(expr "$l_sec" - "$f_sec")
+    if [ "$diff" -eq "86400" ];
+    then
+          exit 0 
+    else
+          exit 1
+    fi
+
+
+id: curl_to_internet_from_connected_pc
+_summary: Using ‘curl’ download a file from a public internet site
+_description:
+    this test will download a file from a public internet site using curl
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+  output=$(snap list | grep curl | awk '{print $1}')
+  if [ -n $output ]
+  then
+    print "curl already installed" 
+    echo "cd /home/manish2359/snap && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -"
+    cd /home/manish2359/snap && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -
+  else
+    snap install curl
+    echo "cd /home/manish2359 && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -"
+    cd /home/manish2359 && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -
+  fi
+  
+id: aftr_configuration_edge
+_summary: Verify AFTR Configuration from AP BLOB
+_description:
+    Verify below configurations:
+        a) AFTR address is configured on SSN NIC via BLOB
+        b) IOTR interface are configured automatically.
+        c) DNS/TRAP server
+        d) Time accuracy configs for Milli devices
+category_id: provisioning
+plugin: shell
+estimated_duration: 120.0
+command:
+    echo "Command: itron-edge.netmgr -i iotr aftr_address show" && itron-edge.netmgr -i iotr aftr_address show
+    addr=$(itron-edge.netmgr -i iotr aftr_address show | awk '{print $4}')
+    if [ -n $addr ]
+    then
+      echo "AFTR address is configured on SSN NIC successfully : $addr"
+      echo "Checking IOTR interface are configured automatically" && ifconfig
+      b4=$(ifconfig b4 | grep UP | awk '{print $1}' )
+      if [ "$b4" = "UP" ]
+      then
+       echo "b4 interface up and running"
+       ip_b4=$(ifconfig b4 | grep inet | awk '{print $2}')
+       if [ "$ip_b4" != "0" ]
+       then
+         echo "b4 interface has ip_$ip_b4"
+       else
+         echo "b4 interface up but does not have any ip assigned"
+       fi
+       eth0=$(ifconfig eth0 | grep UP | awk '{print $1}')
+       if [ "$eth0" = "UP" ]
+       then
+        echo "eth0 interface up and running"
+        ip_eth0=$( ifconfig eth0 | grep inet | awk '{print $2}' | head -1)
+        if [ "$ip_eth0" != "0" ]
+        then
+          echo "eth0 interface has ip_$ip_eth0"
+        else
+          echo "b4 interface up but does not have any ip assigned"
+        fi
+        tun6=$(ifconfig tun6 | grep UP | awk '{print $1}' )
+        if [ "$tun6" = "UP" ]
+        then
+          echo "tun6 interface up and running"
+          echo " All the interface are UP and Running now Checking for TRAP Server"
+          echo "Command: itron-edge.netmgr -i nm_trap host_get" && itron-edge.netmgr -i nm_trap host_get
+          trap_server=$(itron-edge.netmgr -i nm_trap host_get | awk '{print $4}')
+          if [ -n  trap_server ]
+          then
+            echo "trap_server are configured on SSN_NIC"
+          else
+            echo "traper_server are not Configured on SSN_NIC"
+            exit 1
+        else
+          echo "tun6 interface Down"
+          exit 1
+        fi
+       else
+        echo  "eth0 interface Down"
+        exit 1
+       fi
+      else
+       echo "b4 interface Down"
+       exit 1
+      fi
+    else
+      echo "AFTR address is not configured on SSN NIC"
+      exit 1
+    fi
+   
+   
+################################ WAN Mode Test Case in EDGE Mode #############################################
+
+id: wan_mode-edge_connected_with_wan
+_summary: WAN_Mode_Test: Verify EDGE got required addresses from WAN
+_description:
+      this automated-test will verify EDGE got required addresses from WAN advertising blobs (DNS/AFTR/TRAP)
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+   echo "COMMAND: itron-edge.netmgr -i dns server_list" && itron-edge.netmgr -i dns server_list
+   itron-edge.netmgr -i dns server_list | awk '{if($3 == "0") exit 1}'
+   echo "COMMAND: itron-edge.netmgr -i iotr aftr_address show" && itron-edge.netmgr -i iotr aftr_address show
+   itron-edge.netmgr -i iotr aftr_address show | awk '{if($4 == "0") exit 1}'
+   echo "COMMAND: itron-edge.netmgr -i nm_trap host_get" && itron-edge.netmgr -i nm_trap host_get
+   itron-edge.netmgr -i nm_trap host_get | awk '{if($4 == "0") exit 1}'
+
+id: wan_mode-edge_to_bos_via_wan
+_summary: WAN_Mode_Test: Verify connectivity from EDGE to BOS via WAN 
+_description:
+      this automated-test will Verify connectivity from EDGE to BOS via WAN
+plugin: shell
+estimated_duration: 5s
+category_id: edge_mode_test
+command:
+     wan_mac=$(itron-edge.netmgr -i nexthop show | grep destination | awk '{print $1}')
+     if [ "$wan_mac" != "0" ]
+     then
+        echo "WAN/AP is reachable"
+        echo "Command: itron-edge.netmgr -i iotr aftr_address show" &&  itron-edge.netmgr -i iotr aftr_address show
+        echo "Command: itron-edge.netmgr -i dns server_list" && itron-edge.netmgr -i dns server_list
+        aftr=$(itron-edge.netmgr -i iotr aftr_address show | awk '{print $4}')
+        ping6 -c 10 $aftr
+        ping6 -c 10 $aftr | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'
+        dns=$(itron-edge.netmgr -i dns server_list | cut -b 13-51)
+        ping6 -c 10 $dns
+        ping6 -c 10 $dns | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'
+     else
+       echo "unable to find WAN/AP"
+     fi

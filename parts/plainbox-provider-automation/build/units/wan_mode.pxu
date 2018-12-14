@@ -1,0 +1,184 @@
+id: tunnel_configuration
+_summary: Verify WAN mode is activated, interface configured & tunnel is established
+_description:
+     Verify below configurations:
+        a) WAN Mode Activation
+        b) WAN Mode interfaces are configured automatically.
+        c) Tunnel establishmed
+category_id: wan_mode_test 
+plugin: shell
+estimated_duration: 120.0
+command:
+#checking for interfaces
+    fun(){                                                           
+        status=$(ifconfig $1 | grep UP | awk '{print $1}')     #$1 return weather differnt interfaces of WAN-Mode are "UP"/not
+        if [ "$status" = "UP" ] ; then
+           echo "$1 interface is active" ; else
+           echo "$1 interface is down"
+           exit 1
+        fi
+        } 
+#checking for Tunnel
+     fun1(){
+        sleep 300
+        ip xfrm state
+        tunnel=$(ip xfrm state)
+        if [ -n "$tunnel" ]
+        then
+          echo "$(tput setaf 3)Tunnel is created"
+          exit 0
+        else
+          echo "Tunnel is not created"
+          exit 1
+        fi
+       }         
+    wan_status=$( snap list | grep itron-wan | awk '{print $6}' )    #$6 return Wan enabled(-) or disable
+    if [ "$wan_status" = "-" ]
+    then
+      echo "checking interfaces" && ifconfig
+      fun "b4"                                                       #calling interface function for multiple interfaces
+      fun "eth0"
+      fun "ssn0"
+      fun "tun6"
+      echo "$(tput setaf 3) Checking for Tunnel establishment"       #($tput setaf 3) print the string in differnt(Brown) colour
+      fun1                                                           #calling tunnel function 
+    else
+     echo "$(tput setaf 3) WAN-Mode disbaled"
+     exit 1
+    fi
+
+
+id: led_status_wan
+_summary: Verify the led status is set to GREEN
+_description:
+      In EDGE Mode LED Status should be GREEN
+      /sys/class/gpio/gpio193/value = 0
+      /sys/class/gpio/gpio192/value = 1
+plugin: shell
+estimated_duration: 5s
+category_id: wan_mode_test
+command:
+   st=$'1 0: EDGE Mode (RED)\n1 1: CLIENT Mode (ORANGE)\n0 1: WAN Mode (GREEN)'
+   echo "$st"
+   echo "Expected: 0 1 WAN MODE (GREEN)"
+   val_1=$(cat /sys/class/gpio/gpio193/value)
+   val_2=$(cat /sys/class/gpio/gpio192/value)
+   if [ $val_1 = "0" -a $val_2 = "1" ]
+   then
+         exit 0
+   else
+         exit 1
+   fi
+
+#id: Connectivity_with_AP_Nan_Side
+#_summary: Verify from the IOTR device we have IPv6 connectivity using ping6 to the AP NAN side, REG/DNS Server, and AFTR address.
+#_description:
+#         Verify from the IOTR device we have IPv6 connectivity using ping6 to the AP NAN side, REG/DNS Server, and AFTR address.
+#category_id: wan_mode_test
+#plugin: shell
+#estimated_duration: 10.0
+#command:
+#   echo "Command: itron-wan.netmgr -i iotr aftr_address show" && itron-wan.netmgr -i iotr aftr_address show
+#   aftr=$(itron-wan.netmgr -i iotr aftr_address show |  )
+
+
+id: ap_functionality_1
+_summary: Verify DNS/TRAP from IOTR to BOS
+_description:
+         Verify DNS/TRAP from IOTR to BOS.
+category_id: wan_mode_test
+plugin: shell
+estimated_duration: 10.0
+command:
+    echo "Command: itron-wan.netmgr -i nm_trap host_get" && itron-wan.netmgr -i nm_trap host_get
+    trap=$(itron-wan.netmgr -i nm_trap host_get | awk '{print $4}')                  #$4 return ip
+    str=$(ping6 -c 2 $trap | tail -1 | awk '{print $2}') && ping6 -c 2 $trap
+    if [ "$str" = min/avg/max/mdev ]                                                 
+    then 
+     echo "Trap configured"
+    else 
+     echo "Trap configured failed"
+     exit 1
+    fi
+
+#id: ap_functionality_2
+#_summary: Verify node registered to IOTR in WAN mode.
+#_description:
+#         Verify node registered to IOTR in WAN mode Verify DNS/TRAP from registered node to BOS.
+#category_id: wan_mode_test
+#plugin: shell
+#estimated_duration: 10.0
+#command:
+#    echo "Command: itron-wan.netmgr -i nm_trap host_get" && itron-wan.netmgr -i nm_trap host_get
+#    trap=$(itron-wan.netmgr -i nm_trap host_get | awk '{print $4}')
+#    str=$(ping6 -c 2 $trap | tail -1 | awk '{print $2}') && ping6 -c 2 $trap
+#    if [ "$str"= min/avg/max/mdev ]
+#    then
+#     echo "Trap configured successfully"
+#    else
+#     echo "Trap configure failed"
+#     exit 1
+#    fi
+
+id: switching_to_wan_mode
+_summary: Use SNAP to switch to WAN mode & enable StrongSwan tunnel configuration 
+_description:
+         Use SNAP to switch to WAN mode and enable StrongSwan tunnel configuration on IOTR
+category_id: wan_mode_test
+plugin: shell
+estimated_duration: 120.0
+command:
+    fun() {
+        sleep 300
+        ip xfrm state
+        tunnel=$(ip xfrm state)
+        if [ -n "$tunnel" ]
+        then
+          echo "$(tput setaf 1)Tunnel is created"
+          exit 0
+        else
+          echo "Tunnel is not created"
+          exit 1
+        fi
+       }        
+    echo "Command: Snap list" && snap list
+    wan=$(snap list | grep itron-wan | awk '{print $6}')
+    if [ "$wan" == "-" ]
+    then
+     echo "WAN Mode enabled"; fun 
+    else
+     echo "WAN mode is disabled"; echo "Checking for Mode which are enabled"
+     list=$(snap list | grep itron-edge | awk '{print $6}')
+     if [ "$list" == "-" ]
+     then
+      echo "Edge mode Enabled"; echo "Enabling WAN Mode"; snap enable itron-wan; echo "Edge mode disabling"; snap disable itron-edge; fun 
+     else
+      echo "Edge mode is disable"
+      client=$(snap list | grep itron-client | awk '{print $6}')
+      if [ "$client" == "-" ]
+      then 
+       echo "Client-Mode Enable"; echo "Enabling WAN-Mode"; snap enable itron-wan; echo "disabling Client-Mode"; snap disable itron-client; fun
+      else
+       echo "Client is disabled"
+       snap enable itron-wan; fun
+      fi  
+     fi
+   fi
+  
+id: ntp_server_wan
+_summary: Verify edge can reach the ubuntu ntp server and get the proper timesync
+_description:
+      Verify edge can reach the ubuntu ntp server and get the proper timesync
+plugin: shell
+estimated_duration: 5s
+category_id: wan_mode_test
+command:
+   echo "command: journalctl | grep systemd-timesyncd" && journalctl | grep systemd-timesyncd
+   count=$(journalctl | grep systemd-timesyncd | grep -c Synchronized)
+   if [ "$count" != "0" ]
+   then
+        exit 0 
+   else
+        exit 1 
+   fi
+ 

@@ -1,0 +1,112 @@
+id: snap_login
+_summary: Verify connection with snap store 
+plugin: manual
+category_id: ubuntu_store_functionality
+estimated_duration: 5s
+_description:
+  PURPOSE:
+       this test case will verify weather IoTR device are able to connect to ITRON-Sanbox with the account created on ubuntu core
+  STEPS:
+     1. Connect your PC to IoTR via Ethernet cable before boot.
+     2. Boot into system
+     3. ssh the device from other machine in same network
+        [ ssh Ubuntu_SSO_user_name@device_ IP_address ]
+     4. Login with the account created on ubuntu core
+        [ sudo snap login  Ubuntu_SSO_email_address ]
+     5. Check it’s able to see the itron snaps available in the itron store
+        [ snap find itron ]
+   VERIFICATION:
+     Did all the steps work?
+
+id: itron-store
+_summary: Verify the itron snaps available in the itron store
+_description:
+  Check it’s able to see the itron snaps available in the itron store
+plugin: shell
+category_id: ubuntu_store_functionality
+estimated_duration: 30s
+command:
+   out=$(snap find itron | awk '{print $1}' )	               #`$1` return itron-snap name
+   check=$(cut -d '-' -f1 <<<"$out" | head -2 | tail -1  )     # cut itron-{name} to itron
+   if [ -n $check ]
+   then
+     echo "Command: snap find itron" && snap find itron
+   else
+     echo "itron snaps not available in the itron store"
+     exit 1
+   fi
+
+id: snap_refresh
+_summary: Verify snap refresh are able to update the snaps from itron-snap store
+_description:
+   Check that IoTR is able to update the snaps from the Itron-Sandbox-2 store
+plugin: shell
+category_id: ubuntu_store_functionality
+estimated_duration: 120s
+command:
+     fun(){
+        out1=$(snap refresh $1 --amend 2>&1 | grep -c error)
+        if [ "$out1" != "0" ]; then
+            echo "Error :: cannot refreshed the $1 snap"
+            exit 1
+        else 
+            exit 0
+        fi
+        }
+        edge=$(snap list | grep itron-edge | awk '{ print $6 }')
+        if [ $edge == "-" ] ; then
+        fun "itron-edge"
+        else
+            wan=$(snap list | grep itron-wan | awk '{ print $6 }')
+            if [ $wan == "-" ]; then
+              fun "itron-wan"
+            else
+            client=$(snap list | grep itron-client | awk '{ print $6 }')
+              if [ $client == "-" ]; then
+                  fun "itron-client"
+              else
+                  exit 1
+              fi
+           fi
+        fi
+
+id: test-hello-world_ubuntu
+_summary: Verify Snap store is able to be contacted
+_description:
+    Checking Snap downloded from Store
+category_id: ubuntu_store_functionality 
+plugin: shell
+estimated_duration: 1.0
+command:
+  output=$(snap list | grep test-snapd-tools | awk '{print $1}')
+  if [ -n $output ]
+  then
+     snap remove test-snapd-tools && snap install test-snapd-tools && echo "test-snapd-tools snap installed"
+  else
+    snap install test-snapd-tools
+    echo "test-snapd-tools snap installed"
+  fi
+
+
+id: config_test
+_summary: will read two var from the config file & return the addition of the two var
+_description: 
+     read two var from config file and return the addition of the two var
+category_id: ubuntu_store_functionality
+plugin: shell
+estimated_duration: 1.0
+command:
+   a="$(snapctl get a)"
+   b="$(snapctl get b)"
+   echo $a
+   echo $b
+   sum=$(($a+$b))
+   echo "The sum is = $sum"  
+   if [ $sum -gt 10 ]
+   then
+     echo "ok nb are correct"
+   else
+     echo "nok nb are modified"
+     exit 1
+   fi
+   

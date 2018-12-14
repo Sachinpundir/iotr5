@@ -1,0 +1,140 @@
+id: pc_obtains_address_via_dhcp_from_iotr 
+_summary: Connect PC to IOTR via Ethernet obtains an IPv4/IPv6 address from the IOTR.
+_description:
+     Verify weather PC connected to IoTR via Ethernet obtains an IPv4/IPv6 address from the device.
+plugin: shell
+category_id: provisioning
+estimated_duration: 1200.90
+command:
+     for i in {2..254}
+     do
+        echo "Trying to ping IP : 192.168.16.$i"
+        output=$(ping -c 2 192.168.16.$i | tail -1 | awk '{print $2}')
+        if [ "$output" = min/avg/max/mdev ]; then
+          echo "DHCP assigned IP : 192.168.16.$i"
+          exit 0
+        fi
+     done
+     exit 1
+
+id: iotr_configuration
+_summary: IOTR Configuration
+plugin: manual
+category_id: provisioning
+estimated_duration: 120.0
+_description:
+ PURPOSE:
+      Check user can access snapweb from other machine
+ STEPS:
+     1. Connect your PC to IoTR via Ethernet cable before boot.
+     2. Boot into system
+     3. Browse following url with browser from other machine in same network
+        http://[ip address of the IoTR Device ]
+     4. Make sure that all the proxy are disabled.
+     5. Wait for almost 1min to load the page
+     5. Now local SSN Edge Router Config page opened .
+ VERIFICATION:
+     Did all the steps work?
+
+id: iotr_nic_setting
+_summary: IOTR SSN NIC Settings
+plugin: manual
+category_id: provisioning
+estimated_duration: 20.0
+_description:
+ PURPOSE:
+     This test will verify IOTR SSN NIC settings via web page and net_mgr (country code, network id, start word, SSN firmware version, MAC address)
+ STEPS:
+     1. Connect your PC to IoTR via Ethernet cable before boot.
+     2. Boot into system
+     3. Browse following url with browser from other machine in same network
+        http://[ip address of the IoTR Device ]
+     5. Wait for almost 1min to load the page
+     6. Now you are able see local SSN Edge Router Config page.
+     7. You can See Device Manager which is on the left side of the page.
+     8. Select IoTR and go to Provisioning.
+     9. Here you can see NIC Start Word, NIC FW version, NIC Device Type and you can Set Network Id and Country Code as well.
+ VERIFICATION:
+     Did all the steps work?
+
+id: test-hello-world
+_summary: Verify Snap store is able to be contacted 
+_description:
+    Checking test-snapd-tools snap downloded from Store
+category_id: provisioning
+plugin: shell
+estimated_duration: 1.0
+command:
+  output=$(snap list | grep test-snapd-tools | awk '{print $1}') #checking weather test-snapd-tools installed or not
+  if [ -n $output ]
+  then
+     snap remove test-snapd-tools && snap install test-snapd-tools && echo "test-snapd-tools snap installed"
+  else
+    snap install test-snapd-tools
+    echo "test-snapd-tools snap installed"
+  fi
+
+id: ssh_login
+_summary: SSH is enabled and operational
+category_id: provisioning
+plugin: manual
+estimated_duration: 120
+_description:
+ PURPOSE:
+ Check if user can access the system through ssh from other machine
+_steps:
+ 1. Execute following command on other machine in same network
+     ssh [user id]@[ip address of the IoTR]
+ 2. Enter password to login
+_verification:
+ Can log into system through ssh from other machine
+
+id: checking_ntp_configured
+_summary: Verify IoTR can reach the ubuntu ntp server and get the proper timesync
+_description:
+         Verify IoTR can reach the ubuntu ntp server and get the proper timesync
+category_id: provisioning
+plugin: shell
+estimated_duration: 1.0
+command:
+   echo "command: journalctl | grep systemd-timesyncd" && journalctl | grep systemd-timesyncd
+   count=$(journalctl | grep systemd-timesyncd | grep -c Synchronized)  #checking Sync with ntp server -c flag returns count
+   if [ "$count" == "0" ]	#checking if count equal to zero then return with error
+   then
+        exit 1 
+   else
+        exit 0 
+   fi
+   
+id: checking_mode_activation
+_summary: Verify IoTR Modes
+_description:
+         Checking IoTR Modes
+category_id: provisioning
+plugin: shell
+estimated_duration: 1.0
+command:
+    wan=$(snap list | grep itron-wan | awk '{print $6}')
+    edge=$(snap list | grep itron-edge | awk '{print $6}')
+    client=$(snap list | grep itron-client | awk '{print $6}')
+    if [ "$wan" == "-" -a "$edge" == "-" ]
+    then
+      echo "ERROR :: WAN & EDGE Mode both are enabled at the same time "
+      exit 1
+    elif [ "$wan" == "-" -a "$client" == "-" ]
+    then
+       echo "ERROR :: WAN & CLIENT Mode both are enabled at the same time"
+       exit 1
+    elif [ "$client" == "-" -a "$edge" == "-" ]
+    then
+       echo "ERRRO :: Client & Edge Mode both are enabled at the same time"
+       exit 1
+    else
+       echo  "Only one mode is active"      
+    fi
+    if [ "$wan" == "disabled" -a "$client" == "disabled" -a "$edge" == "disabled" ]
+    then
+      echo "ERROR :: All Mode are disabled"
+      exit 1
+    fi
+

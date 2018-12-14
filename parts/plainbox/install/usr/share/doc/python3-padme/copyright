@@ -1,0 +1,21 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: padme
+Source: https://github.com/zyga/padme
+
+Files: *
+Copyright: 2015 Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+License: LGPL-3
+ Padme is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License version 3,
+ as published by the Free Software Foundation.
+ .
+ Padme is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public License
+ along with Padme.  If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian-based systems the full text of the GPL, version 3, can be found at
+ /usr/share/common-licenses/LGPL-3.

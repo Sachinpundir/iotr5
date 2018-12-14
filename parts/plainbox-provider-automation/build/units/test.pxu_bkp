@@ -1,0 +1,34 @@
+unit: test plan
+id: iotr2-test-automation
+_name: Northstar-Feature-Automation
+_description:
+    This test plan includes all test related to Northstart Release
+estimated_duration: 1h
+include:
+   PC_Obtains_Address_via_DHCP_from_IOTR 
+   IOTR_Configuration
+   IoTR_NIC_Setting
+   SSH_Login
+   Test-Hello-World
+   IPv4_connectivity_to_Internet    
+   Time_Sync_Accuracy
+   IoTR_able_to_scan_other_IoTRs_and_APs  
+   IOTR_registered_to_Access_Point
+   Curl_to_internet_from_connected_pc
+   IoTR_updates_the_timesync_information
+   snap_login
+   itron-store
+   snap_refresh
+   IOTR_CLIENT_mode_activation
+   IOTR_registered_to_Access_Point_in_client_mode
+   IPv4_connectivity_to_Internet_in_client_mode
+   Curl_to_internet_from_connected_pc_in_client_mode
+   IPv6_connectivity_to_Back_office_from/to_IoTR
+   AFTR_Configuration_edge
+   AFTR_Configuration_client
+   Tunnel_Configuration
+   AP_functionality_1
+   Switching_to_WAN_mode
+
+
+

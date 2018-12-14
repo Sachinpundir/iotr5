@@ -1,0 +1,24 @@
+!BuildState
+assets:
+  installed-packages: []
+  installed-snaps: [hello-world=27, simple=x8, core=6034]
+  uname: 'Linux 4.13.0-36-generic #40~16.04.1-Ubuntu SMP Fri Feb 16 23:25:58 UTC 2018
+    x86_64 x86_64 x86_64 GNU/Linux'
+extracted_metadata:
+  files: []
+  metadata: !ExtractedMetadata
+    _data: {}
+project_options: {deb_arch: amd64}
+properties:
+  after: []
+  build: ''
+  build-attributes: []
+  build-packages: []
+  disable-parallel: false
+  install: ''
+  organize: {'*': bin/}
+  override-build: snapcraftctl build
+  prepare: ''
+schema_properties: []
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}

@@ -1,0 +1,110 @@
+id: iotr_client_mode_activation 
+_summary: Verifying client mode activation
+_description:
+      This Automated test will verify IoTR client mode is active
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  echo "Command: snap list" && snap list
+  snap list | grep "itron-client" | awk '{if($6 != "-") exit 1}'     
+  #checking client mode is active or not, here `$6` return snap enable (reprsented by -) or disable
+
+id: led_status_client
+_summary: Verifying the led status is set to Orange
+_description:
+      In EDGE Mode LED Status should be Orange
+      /sys/class/gpio/gpio193/value = 1
+      /sys/class/gpio/gpio192/value = 1
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+   st=$'1 0: EDGE mode (SOLID RED)\n1 1: CLIENT mode (ORANGE)\n0 1: WAN mode (GREEN)'
+   echo "$st"
+   echo "Expected: 1 1 CLIENT MODE (ORANGE)"
+   val_1=$(cat /sys/class/gpio/gpio193/value)
+   val_2=$(cat /sys/class/gpio/gpio192/value)
+   echo "Actual: $val_1 $val_2"
+   if [ $val_1 = "1" -a $val_2 = "1" ]		#checking Expected with Autual gpio value is high or low
+   then
+         exit 0
+   else
+         exit 1
+   fi
+
+id: iotr_registered_to_access_point_in_client_mode
+_summary: Verifying IoTR Registerd to Access Point
+_description:
+      This Automated Test will verify IoTR Registerd to Access Point
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  echo "Command: itron-client.netmgr -i nodeq 0" &&  itron-client.netmgr -i nodeq 0
+  itron-client.netmgr -i nodeq 0 | head -1 | awk '{if($3 == 0) exit 1}'    
+  #if no node are available return with error, `$3` return no. of nodes
+  echo "Command: itron-client.netmgr -i nexthop show" && itron-client.netmgr -i nexthop show
+  itron-client.netmgr -i nexthop show | grep destination | awk '{if($1 = 0) exit 1}'  #$1 return ap_destination route 
+
+id: ipv4_connectivity_to_internet_in_client_mode
+_summary: IPv4 connectivity to Internet from device 
+_description:
+      This Automated Test will verify IPv4 connectivity to Internet from device
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  echo "Checking connectivity to internet by pinging Google DNS Server" &&  ping -c 10 8.8.8.8  #-c flags is ping count 
+  ping -c 10 8.8.8.8 | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'  #$4 return no. of packets recevied
+
+id: recursion_lookup_and_ping_from_iotr
+_summary: IPv4 connectivity and DNS lookup to the internet using ping to DNS hostname
+_description:
+      This Automated Test will verify IPv4 connectivity and DNS lookup to the internet using ping to DNS hostname
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  echo "IPv4 connectivity and DNS lookup to the internet using ping to DNS hostname" &&  ping -c 10 google.com
+  ping -c 10 google.com | tail -2 | head -1 | awk '{if($4 == 0) exit 1}' #`$4` return no. of packets recevied
+
+id: curl_operation_client_mode
+_summary: Using ‘curl’ download a file from a public internet site
+_description:
+    This test will download a file from a public internet site using curl
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  output=$(snap list | grep curl | awk '{print $1}')
+  if [ -n $output ]
+  then
+    print "curl already installed" 
+    echo "cd /home/manish2359/snap && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -"
+    cd /home/manish2359/snap && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -
+  else
+    snap install curl
+    echo "cd /home/manish2359 && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -"
+    cd /home/manish2359 && curl -O https://github.com/sikilli/blob/develop/build-linux.txt && rm build-linux.txt && cd -
+  fi
+
+id: ipv6_connectivity_to_back_office_from/to_iotr
+_summary: Verify from device have IPv6 connectivity using ping6 to AP .
+_description:
+      This Automated Test will verify device connectivity to AP side, REG/DNS Server & AFTR using ping6
+plugin: shell
+estimated_duration: 5s
+category_id: client_mode_test
+command:
+  echo "Command: itron-client.netmgr -i iotr aftr_address show" &&  itron-client.netmgr -i iotr aftr_address show
+  echo "Command: itron-client.netmgr -i dns server_list" && itron-client.netmgr -i dns server_list
+  ipv6_a_a=$(itron-client.netmgr -i iotr aftr_address show | awk '{print $4}')  #`$4` return aftr addr
+  ping6 -c 10 $ipv6_a_a								#loging
+  ping6 -c 10 $ipv6_a_a | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'         #`$4` return no. of packets recevied
+  ipv6_d_s_l=$(itron-client.netmgr -i dns server_list | cut -b 13-51)           #return dns server ipv6 addr
+  ping6 -c 10 $ipv6_d_s_l							#loging
+  ping6 -c 10 $ipv6_d_s_l | tail -2 | head -1 | awk '{if($4 == 0) exit 1}'       #$4` return no. of packets recevied
+
+
+

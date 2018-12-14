@@ -1,0 +1,8 @@
+#!/usr/bin/env checkbox-cli-wrapper
+[launcher]
+app_id = com.aricent.ggn:iotr2-automation
+launcher_version = 1
+stock_reports = text, submission_files
+
+[test plan]
+filter = * iotr2-test-automation*, *tpm-smoke-tests

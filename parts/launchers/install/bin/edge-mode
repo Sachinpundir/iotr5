@@ -1,0 +1,16 @@
+#!/usr/bin/env checkbox-cli-wrapper
+[launcher]
+app_id = com.aricent.ggn:iotr2-automation 
+launcher_version = 1
+stock_reports = text, submission_files
+
+[test plan]
+unit = com.aricent.E2E_testing::edge-mode
+forced = yes
+
+[test selection]
+forced = yes
+
+[ui]
+type = silent
+

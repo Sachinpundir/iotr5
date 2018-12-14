@@ -1,0 +1,83 @@
+id: usb
+_summary: usb to iotr and vice versa
+_description:
+         usb to iotr and vice versa.
+category_id: usb_stress
+plugin: shell
+estimated_duration: 1.0
+command:
+    declare -A data
+    # Checking snap is installed if not then install it.
+    # and make it enable
+    a=$(snap list | grep -c "udisks2")
+    if [ "$a" = "0" ]
+    then
+           echo "nok"
+           snap install udisks2
+           snap set udisks2 automount.enable=true
+           sleep 5
+    fi
+# Checking how many device(USB) are connected
+    dev=$(lsblk | grep -c "sd")
+    echo "number of used usb port $num_dev"
+    if [ "$num_dev" = "0" ]
+    then
+          echo "ok"
+          exit 1
+    fi
+# Grabbing the path of mounted USB
+    path=$(lsblk | grep "sda1" | awk '{print $7}')
+    echo $path
+# Create a file for transfer Device to USB and vice-versa
+    file_size=1024000
+    dd if=/dev/zero of=$HOME/file_t_u.txt count=$file_size
+# f => flage
+# i => iteration
+# time_in_sec => timing for loop
+    f=0
+    i=1
+    time_in_sec=$(snapctl get time_in_sec_usb)
+    echo $time_in_sec 
+    name=("iteration_no" "idle__cpu__%" "total_memory"  "used__memory " "free__memory " "checksum__is" "t_rt_dev_usb" "t_rt_usb_dev")
+    date=$(date +%s)
+    echo $date
+# Below loop run for certain time i.e(time_in_sec) and in that time it calls the python
+#   script to copy the data from iotr to USb and vice-versa and it will calculate the
+#   check sum, monitor the CPU usages and memory.
+    while [ `date +%s` -lt `expr $date + $time_in_sec` ]
+    do
+            data[$i,0]=$i
+            data[$i,1]=$(top | head -3 | tail -1 | awk ' {print $8}')
+            data[$i,2]=$(free -m | head -2| tail -1 | awk ' { print $2}')
+            data[$i,3]=$(free -m | head -2| tail -1 | awk ' { print $3}')
+            data[$i,4]=$(free -m | head -2| tail -1 | awk ' { print $4}')
+            cksum_iotr=$(cksum $HOME/file_t_u.txt | awk '{print $1}')
+            python3 $HOME/n_iotr_to_usb/iotr_to_usb.py 1 $i $path
+            data[$i,6]=$(cat $HOME/n_iotr_to_usb/time.txt)
+            cksum_usb=$(cksum $path/file_t_u.txt | awk '{print $1}')
+            data[$i,5]="ok"
+            if [ "$cksum_iotr" != "$cksum_usb" ]
+            then
+                  data[$i,5]="not_ok"
+                  echo "cksum is not equal in $i iteration"
+                  f=1
+              # exit 1
+            fi
+            python3 $HOME/n_iotr_to_usb/iotr_to_usb.py 2 $i $path
+            data[$i,7]=$(cat $HOME/n_iotr_to_usb/time.txt)
+            ((i++))
+    done
+# logging the data into file
+    for ((a=0; a<=7; a++))
+    do
+            printf "\n%s  :" ${name[$a]} 2>&1 | tee -a data1.txt
+            for ((b=1; b<=i; b++))
+            do
+                   printf " %12s"  ${data[$b,$a]} 2>&1 | tee -a data1.txt
+            done
+    done
+    if [ $f == "1" ]
+    then
+            echo "nok"
+            exit 1
+    fi

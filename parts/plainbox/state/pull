@@ -1,0 +1,46 @@
+!PullState
+assets:
+  build-packages: []
+  build-snaps: []
+  source-details: null
+  stage-packages: [libpolkit-gobject-1-0=0.105-14.1ubuntu0.1, init-system-helpers=1.29ubuntu4,
+    'gir1.2-gudev-1.0=1:230-2', libdbus-1-3=1.10.6-1ubuntu3.3, libnih-dbus1=1.0.3-4.3ubuntu1,
+    openssl=1.0.2g-1ubuntu4.14, libgirepository-1.0-1=1.46.0-3ubuntu1, libparted2=3.2-15ubuntu0.1,
+    dbus=1.10.6-1ubuntu3.3, systemd-shim=9-1bzr4ubuntu1, libsqlite3-0=3.11.0-1ubuntu1,
+    libicu55=55.1-7ubuntu0.4, python3-urllib3=1.13.1-2ubuntu0.16.04.2, python3.5=3.5.2-2ubuntu0~16.04.5,
+    python3=3.5.1-3, python3.5-minimal=3.5.2-2ubuntu0~16.04.5, libpolkit-agent-1-0=0.105-14.1ubuntu0.1,
+    libcgmanager0=0.39-2ubuntu5, mime-support=3.59ubuntu1, python3-six=1.10.0-3, python3-checkbox-ng=0.23-2,
+    libmpdec2=2.4.2-1, 'libgudev-1.0-0=1:230-2', python3-requests=2.9.1-3ubuntu0.1,
+    libexpat1=2.1.0-7ubuntu0.16.04.3, python3-plainbox=0.25-1, python3-pyparsing=2.0.3+dfsg1-1ubuntu0.1,
+    python3-xlsxwriter=0.7.3-1, udisks2=2.1.7-1ubuntu1, python3-minimal=3.5.1-3, gir1.2-glib-2.0=1.46.0-3ubuntu1,
+    libnih1=1.0.3-4.3ubuntu1, libpython3-stdlib=3.5.1-3, python3-markupsafe=0.23-2build2,
+    libpam-systemd=229-4ubuntu21.10, parted=3.2-15ubuntu0.1, python3-pkg-resources=20.7.0-1,
+    libdbus-glib-1-2=0.106-1, python3-guacamole=0.9.2-1, dh-python=2.20151103ubuntu1.1,
+    libpolkit-backend-1-0=0.105-14.1ubuntu0.1, python3-dbus=1.2.0-3, policykit-1=0.105-14.1ubuntu0.1,
+    libcap-ng0=0.7.7-1, libxml2=2.9.3+dfsg1-1ubuntu0.6, python3-gi=3.20.0-0ubuntu1,
+    plainbox=0.25-1, libudisks2-0=2.1.7-1ubuntu1, ca-certificates=20170717~16.04.1,
+    libffi6=3.2.1-4, libpython3.5-stdlib=3.5.2-2ubuntu0~16.04.5, python3-jinja2=2.8-1,
+    python3-checkbox-support=0.22-1, checkbox-ng=0.23-2, python3-lxml=3.5.0-1ubuntu0.1,
+    libpython3.5-minimal=3.5.2-2ubuntu0~16.04.5, python3-padme=1.1.1-2, python3-chardet=2.3.0-2,
+    libglib2.0-0=2.48.2-0ubuntu4.1, libatasmart4=0.19-3, cgmanager=0.39-2ubuntu5,
+    libxslt1.1=1.1.28-2.1ubuntu0.1, libssl1.0.0=1.0.2g-1ubuntu4.14, plainbox-secure-policy=0.25-1]
+extracted_metadata:
+  files: []
+  metadata: !ExtractedMetadata
+    _data: {}
+project_options: {deb_arch: amd64}
+properties:
+  override-pull: snapcraftctl pull
+  parse-info: []
+  plugin: nil
+  source: .
+  source-branch: ''
+  source-commit: ''
+  source-depth: 0
+  source-subdir: ''
+  source-tag: ''
+  source-type: ''
+  stage-packages: [plainbox, checkbox-ng]
+schema_properties: []
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}

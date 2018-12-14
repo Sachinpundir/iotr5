@@ -1,0 +1,7 @@
+#!/bin/bash
+export PATH="$PATH:$SNAP/usr/sbin:$SNAP/sbin:/snap/bin"
+export PYTHONPATH="$SNAP/usr/lib/python3/dist-packages:$PYTHONPATH"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/lib/fwts"
+export GI_TYPELIB_PATH=$SNAP/usr/lib/girepository-1.0:$SNAP/usr/lib/$ARCH/girepository-1.0
+cd $HOME
+exec python3 $(which checkbox-cli) "$@"

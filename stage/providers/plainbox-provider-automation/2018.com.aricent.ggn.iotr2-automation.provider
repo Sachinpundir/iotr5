@@ -1,0 +1,8 @@
+[PlainBox Provider]
+description = The com.aricent.ggn:iotr2-automation provider
+gettext_domain = com_aricent_ggn_iotr2-automation
+name = 2018.com.aricent.ggn:iotr2-automation
+namespace = com.aricent.E2E_testing
+relocatable = True
+version = 1.0
+

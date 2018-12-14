@@ -1,0 +1,11 @@
+!PrimeState
+dependency_paths: !!set {}
+directories: !!set {bin: null}
+files: !!set {bin/checkbox-cli-wrapper: null, bin/client-mode: null, bin/edge-mode: null,
+  bin/test-runner: null, bin/wan-mode: null}
+project_options: {}
+properties:
+  override-prime: snapcraftctl prime
+  prime: ['*']
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}

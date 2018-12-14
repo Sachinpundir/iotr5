@@ -1,0 +1,41 @@
+#!/bin/bash
+while true; do
+    sleep_time="$(snapctl get daily-excution-sleep-time)"
+    echo "sleep-time : $sleep_time"
+    fun(){
+        snap_v_before=$(snap list | grep $1 | awk '{print $3}')    
+        echo "snap version before refresh : $snap_v_before"
+        out1=$(snap refresh $1 --amend 2>&1 | grep -c error)
+        if [ "$out1" != "0" ]; then
+            echo "Error :: cannot refreshed the $1 snap"
+            exit 1
+        else
+            snap_v_after=$(snap list | grep $1 | awk '{print $3}') 
+            echo "snap version after refresh : $snap_v_after"
+            if [ $snap_v_before != $snap_v_after ]
+            then
+                /snap/bin/itron-automated-test.$1               
+            fi
+        fi
+        }
+        edge=$(snap list | grep itron-edge | awk '{ print $6 }')
+        if [ $edge == "-" ] ; then
+        fun "itron-edge"
+        else
+            wan=$(snap list | grep itron-wan | awk '{ print $6 }')
+            if [ $wan == "-" ]; then
+              fun "itron-wan"
+            else
+            client=$(snap list | grep itron-client | awk '{ print $6 }')
+              if [ $client == "-" ]; then
+                  fun "itron-client"
+              else
+                  exit 1
+              fi
+           fi
+        fi
+ 
+
+    sleep "$sleep_time"
+done
+
